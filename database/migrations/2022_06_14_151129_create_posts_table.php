@@ -20,7 +20,8 @@ class CreatePostsTable extends Migration
             $table->string('category', 100);
             $table->timestamp('created_date')->useCurrent();
             $table->timestamp('updated_date')->nullable()->useCurrentOnUpdate();;
-            $table->enum('status', ['Publish', 'Draft', 'Trash']);
+            $table->string('status', 100);
+            // $table->enum('status', ['Publish', 'Draft', 'Trash']);
         });
     }
 

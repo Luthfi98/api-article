@@ -41,7 +41,13 @@ class PostsController extends Controller
                 $where = [];
                 if ($request->status) $where['status'] = $request->status; 
                 $keyword = $request->keyword;
-                $articles = Posts::where($where)->orderBy('created_date','DESC');
+                $order = 'created_date';
+                $sort = 'DESC';
+                if ($request->order_by) $order = $request->order_by; 
+                if ($request->sort_by) $sort = $request->sort_by; 
+
+
+                $articles = Posts::where($where)->orderBy($order, $sort);
                 if ($keyword) {
                     $articles->Where(function($articles) use ($keyword){
                             // var_dump("$pattern");die;
@@ -53,7 +59,7 @@ class PostsController extends Controller
 
                 $articles->take($limit)->skip($offset);
                 // $articles = Posts::where($where)->orderBy('created_date','DESC')->skip($offset)->take($limit)->get();
-                $total = Posts::where($where)->orderBy('created_date','DESC')->get();
+                $total = Posts::where($where)->orderBy($order)->get();
 
                 $response = [
                     'message' => 'List All Posts',
@@ -81,19 +87,25 @@ class PostsController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(
+                [
+                    'status' => false,
+                    'errors' => $validator->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
             Posts::insert($request->all());
             $response = [
+                'status' => true,
                 'message' => 'Successfully Added Article'
             ];
             return response()->json($response, Response::HTTP_OK);
             
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Failed '.$e->errorInfo
+                'status' => false,
+                'errors' => 'Failed '.$e->errorInfo
             ]);   
         }
     }
@@ -108,19 +120,25 @@ class PostsController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            return response()->json(
+                [
+                    'status' => false,
+                    'errors' => $validator->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         try {
             Posts::where('id', $id)->update($request->all());
             $response = [
+                'status' => true,
                 'message' => 'Successfully Updated Article'
             ];
             return response()->json($response, Response::HTTP_OK);
             
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Failed '.$e->errorInfo
+                'status' => false,
+                'errors' => 'Failed '.$e->errorInfo
             ]);   
         }
     }
@@ -130,13 +148,15 @@ class PostsController extends Controller
         try {
             Posts::where('id', $id)->update(['status' => "Trash"]);
             $response = [
+                'status' => true,
                 'message' => 'Successfully Deleted Article'
             ];
             return response()->json($response, Response::HTTP_OK);
             
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Failed '.$e->errorInfo
+                'status' => false,
+                'errors' => 'Failed '.$e->errorInfo
             ]); 
         }
     }
