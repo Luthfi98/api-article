@@ -9,3 +9,7 @@
 - composer install
 - php artisan migrate --seed
 - php artisan serve
+
+
+##Request
+https://documenter.getpostman.com/view/10945541/UzBiQUhp
