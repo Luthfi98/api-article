@@ -1,0 +1,9 @@
+
+<IfModule mod_rewrite.c>
+
+      RewriteCond %{HTTP_HOST} ^api-888living.kssholding.digital/$ [NC,OR]
+  RewriteCond %{HTTP_HOST} ^www.api-888living.kssholding.digital/$
+  RewriteCond %{REQUEST_URI} !your-laravel-folder/public/
+  RewriteRule (.*) /your-laravel-folder/public/$1 [L]
+
+</IfModule>
